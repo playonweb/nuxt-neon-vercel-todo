@@ -9,6 +9,12 @@ If you are working across multiple projects or organizations, the default comman
 neon auth
 ```
 
+### Logout
+There is no explicit `logout` command. To log out, delete the credentials file:
+```bash
+rm ~/.config/neonctl/credentials.json
+```
+
 ### List Organizations & Projects
 To find the IDs you need:
 ```bash
