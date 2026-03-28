@@ -21,7 +21,7 @@ A modern, full-stack Todo application built with [Nuxt 3](https://nuxt.com), [Ne
 
 ### 2. Neon CLI & Branching Setup
 
-To stay organized, use dedicated branches for development:
+To stay organized, use dedicated branches for development. If you are working across multiple projects or organizations, refer to the [Neon CLI Cheatsheet](./neonctl-cheatsheet.md) for advanced commands (`--project-id`, `--org-id`, etc.).
 
 ```bash
 # 1. Install Neon CLI
