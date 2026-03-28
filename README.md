@@ -11,101 +11,112 @@ A modern, full-stack Todo application built with [Nuxt 3](https://nuxt.com), [Ne
 
 ---
 
-## 🛠️ Local Development
+## 🛠️ Local Development (Dev)
 
 ### 1. Prerequisites
 
 - Node.js (v18+)
-- A [Neon](https://neon.tech) database account
+- [pnpm](https://pnpm.io/) (Recommended)
+- [Neon CLI](https://neon.tech/docs/reference/cli) (`neonctl`)
 
-### 2. Environment Variables
+### 2. Neon CLI & Branching Setup
 
-Create a `.env` file in the root of your project and add your database connection string:
+To stay organized, use dedicated branches for development:
 
 ```bash
-# Copy the example file
+# 1. Install Neon CLI
+npm install -g neonctl
+
+# 2. Authenticate
+neonctl auth
+
+# 3. Create a development branch
+neonctl branches create --name dev/your-name
+
+# 4. Get your connection string
+neonctl connection-string dev/your-name
+```
+
+### 3. Environment Variables
+
+Create a `.env` file in the root of your project:
+
+```bash
 cp .env.example .env
 ```
 
-Edit the `.env` file with your credentials:
+Edit your `.env` with the development branch connection string:
 
 ```bash
-DATABASE_URL=your_neon_database_url_here
+DATABASE_URL='postgresql://[user]:[password]@[endpoint]/[dbname]'
+NODE_ENV=development
 ```
 
-### 3. Installation
-
-Install the project dependencies:
+### 4. Installation & Database Setup
 
 ```bash
-# Using npm
-npm install
-```
+# Install dependencies
+pnpm install
 
-### 4. Database Setup
-
-Before running the app, you need to generate and apply migrations to your database:
-
-```bash
 # Generate migrations from your schema
-npm run db:generate
+pnpm db:generate
 
-# Apply migrations to your database
-npm run db:migrate
+# Apply migrations to your development branch
+pnpm db:migrate
 ```
 
 ### 5. Start Development Server
 
-Run the application in development mode:
-
 ```bash
-npm run dev
+pnpm dev
 ```
-
 The app will be available at `http://localhost:3000`.
 
 ---
 
-## 🏗️ Production Environment
+## 🏗️ Deployment Environments
 
-### Building for Production
+### 🌕 Staging Environment
 
-On every production build, the project will automatically apply database migrations to ensure your schema is up-to-date:
+Use a dedicated staging branch in Neon for testing before production:
 
-```bash
-# This command runs `nuxt build` and then `npm run db:migrate`
-npm run build
-```
+1.  **Create Staging Branch**: `neonctl branches create --name staging --parent main`
+2.  **Vercel Configuration**: Set up a "Preview" environment in Vercel.
+3.  **Environment Variables**: Use the staging branch connection string for `DATABASE_URL`.
+4.  **Database Strategy**: Migrations run automatically during build.
 
-### Deployment on Vercel
+### 🌑 Production Environment (Prod)
 
-1.  Push your code to a GitHub repository.
-2.  Import the project to Vercel.
-3.  Add the `DATABASE_URL` environment variable in the Vercel project settings.
-4.  Vercel will automatically detect the build command and deploy your application.
-
-### Previewing Production Build Locally
-
-You can preview the production build on your local machine:
-
-```bash
-npm run preview
-```
+1.  **Main Branch**: The `main` branch in Neon serves as the production database.
+2.  **Vercel Deployment**: Link your GitHub `main` branch to Vercel production.
+3.  **Automatic Migrations**: On every production build, the project runs:
+    ```bash
+    # This command runs `nuxt build` and then `pnpm db:migrate`
+    pnpm build
+    ```
+4.  **Security**: Ensure `DATABASE_URL` is set as a secret in Vercel.
 
 ---
 
-## 📜 Available Scripts
+## 📜 Available Scripts (pnpm)
 
 | Command | Description |
 | :--- | :--- |
-| `npm run dev` | Starts the development server with hot-reloading. |
-| `npm run build` | Builds the app for production and applies database migrations. |
-| `npm run db:generate` | Generates a new migration from your schema definitions. |
-| `npm run db:migrate` | Runs all pending database migrations. |
-| `npm run preview` | Locally previews the production build. |
-| `npm run generate` | Generates a static version of your project. |
-| `npm run postinstall` | Prepares the project for development (runs automatically). |
+| `pnpm dev` | Starts the development server with hot-reloading. |
+| `pnpm build` | Builds the app for production and applies database migrations. |
+| `pnpm db:generate` | Generates a new migration from your schema definitions. |
+| `pnpm db:migrate` | Runs all pending database migrations. |
+| `pnpm preview` | Locally previews the production build. |
+| `pnpm generate` | Generates a static version of your project. |
 
 ---
+
+## 💡 Troubleshooting & Tips
+
+- **Reset Data**: Reset your dev branch if you need to start fresh: 
+  `neonctl branches reset dev/your-name`
+- **Feature Branches**: For large features, create dedicated branches:
+  `neonctl branches create --name dev/auth-system --parent main`
+- **WebSocket vs HTTP**: The app is configured in `server/utils/db.ts` to support both `drizzleClientHttp` and `drizzleClientWs`.
 
 For more details, refer to the [Nuxt 3 Documentation](https://nuxt.com/docs).
